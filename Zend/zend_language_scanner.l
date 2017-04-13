@@ -1265,53 +1265,53 @@ NEWLINE ("\r"|"\n"|"\r\n")
 }
 
 <ST_IN_SCRIPTING>"class" {
-    yy_push_state(ST_LOOKING_FOR_GENERIC);
+    yy_push_state(ST_LOOKING_FOR_TYPE);
 	RETURN_TOKEN(T_CLASS);
 }
 
 <ST_IN_SCRIPTING>"interface" {
-    yy_push_state(ST_LOOKING_FOR_GENERIC);
+    yy_push_state(ST_LOOKING_FOR_TYPE);
 	RETURN_TOKEN(T_INTERFACE);
 }
 
 <ST_IN_SCRIPTING>"trait" {
-    yy_push_state(ST_LOOKING_FOR_GENERIC);
+    yy_push_state(ST_LOOKING_FOR_TYPE);
 	RETURN_TOKEN(T_TRAIT);
 }
 
-<ST_LOOKING_FOR_GENERIC>"extends" {
+<ST_LOOKING_FOR_TYPE>"extends" {
     yy_pop_state();
     RETURN_TOKEN(T_EXTENDS);
 }
 
-<ST_LOOKING_FOR_GENERIC>"implements" {
+<ST_LOOKING_FOR_TYPE>"implements" {
     yy_pop_state();
     RETURN_TOKEN(T_IMPLEMENTS);
 }
 
-<ST_LOOKING_FOR_GENERIC>"{" {
+<ST_LOOKING_FOR_TYPE>"{" {
     yy_pop_state();
     RETURN_TOKEN('{');
 }
 
-<ST_LOOKING_FOR_GENERIC>{LABEL} {
+<ST_LOOKING_FOR_TYPE>{LABEL} {
     zend_copy_value(zendlval, yytext, yyleng);
     RETURN_TOKEN(T_STRING);
 }
 
-<ST_LOOKING_FOR_GENERIC>"<" {
-    yy_push_state(ST_IN_GENERIC);
-    RETURN_TOKEN(T_OPEN_GENERIC);
+<ST_LOOKING_FOR_TYPE>"<" {
+    yy_push_state(ST_IN_TYPE);
+    RETURN_TOKEN(T_OPEN_TYPE);
 }
 
-<ST_IN_GENERIC>{LABEL} {
+<ST_IN_TYPE>{LABEL} {
     zend_copy_value(zendlval, yytext, yyleng);
     RETURN_TOKEN(T_STRING);
 }
 
-<ST_IN_GENERIC>">" {
+<ST_IN_TYPE>">" {
     yy_pop_state();
-    RETURN_TOKEN(T_CLOSE_GENERIC);
+    RETURN_TOKEN(T_CLOSE_TYPE);
 }
 
 <ST_IN_SCRIPTING>"extends" {
@@ -1327,7 +1327,7 @@ NEWLINE ("\r"|"\n"|"\r\n")
 	RETURN_TOKEN(T_OBJECT_OPERATOR);
 }
 
-<ST_IN_SCRIPTING,ST_LOOKING_FOR_PROPERTY>{WHITESPACE}+ {
+<ST_IN_SCRIPTING,ST_LOOKING_FOR_PROPERTY,ST_LOOKING_FOR_TYPE,ST_IN_TYPE>{WHITESPACE}+ {
 	HANDLE_NEWLINES(yytext, yyleng);
 	RETURN_TOKEN(T_WHITESPACE);
 }

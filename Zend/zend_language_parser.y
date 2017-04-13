@@ -189,8 +189,9 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %token T_CLASS      "class (T_CLASS)"
 %token T_TRAIT      "trait (T_TRAIT)"
 %token T_INTERFACE  "interface (T_INTERFACE)"
-%token T_OPEN_GENERIC   "< (T_OPEN_GENERIC)"
-%token T_CLOSE_GENERIC  "> (T_CLOSE_GENERIC)"
+%token T_OPEN_TYPE  "< (T_OPEN_TYPE)"
+%token T_TYPE       "type (T_TYPE)"
+%token T_CLOSE_TYPE "> (T_CLOSE_TYPE)"
 %token T_EXTENDS    "extends (T_EXTENDS)"
 %token T_IMPLEMENTS "implements (T_IMPLEMENTS)"
 %token T_OBJECT_OPERATOR "-> (T_OBJECT_OPERATOR)"
@@ -255,6 +256,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %type <ast> array_pair non_empty_array_pair_list array_pair_list possible_array_pair
 %type <ast> isset_variable type return_type type_expr
 %type <ast> identifier
+%type <ast> type_signature
 
 %type <num> returns_ref function is_reference is_variadic variable_modifiers
 %type <num> method_modifiers non_empty_member_modifiers member_modifier
@@ -499,14 +501,11 @@ is_variadic:
 
 class_declaration_statement:
 		class_modifiers T_CLASS { $<num>$ = CG(zend_lineno); }
-		T_STRING extends_from implements_list backup_doc_comment '{' class_statement_list '}'
-			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, $1, $<num>3, $7, zend_ast_get_str($4), $5, $6, $9, NULL); }
+		T_STRING type_signature extends_from implements_list backup_doc_comment '{' class_statement_list '}'
+			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, $1, $<num>3, $8, zend_ast_get_str($4), $6, $7, $10, $5); }
 	|	T_CLASS { $<num>$ = CG(zend_lineno); }
-		T_STRING extends_from implements_list backup_doc_comment '{' class_statement_list '}'
-			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, 0, $<num>2, $6, zend_ast_get_str($3), $4, $5, $8, NULL); }
-    |   T_CLASS { $<num>$ = CG(zend_lineno); }
-        T_STRING '<' T_STRING '>' extends_from implements_list backup_doc_comment '{' class_statement_list '}'
-            { $$ = zend_ast_create_decl(ZEND_AST_CLASS, $5, $<num>2, $7, zend_ast_get_str($3), $7, $8, $9, $11); }
+		T_STRING type_signature extends_from implements_list backup_doc_comment '{' class_statement_list '}'
+			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, 0, $<num>2, $7, zend_ast_get_str($3), $5, $6, $9, $4); }
 ;
 
 class_modifiers:
@@ -529,6 +528,11 @@ interface_declaration_statement:
 		T_INTERFACE { $<num>$ = CG(zend_lineno); }
 		T_STRING interface_extends_list backup_doc_comment '{' class_statement_list '}'
 			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, ZEND_ACC_INTERFACE, $<num>2, $5, zend_ast_get_str($3), NULL, $4, $7, NULL); }
+;
+
+type_signature :
+		/* empty */        { $$ = NULL; }
+    |   T_OPEN_TYPE T_STRING T_CLOSE_TYPE   { $$ = $2; }
 ;
 
 extends_from:
