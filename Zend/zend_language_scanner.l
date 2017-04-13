@@ -1281,17 +1281,25 @@ NEWLINE ("\r"|"\n"|"\r\n")
 
 <ST_LOOKING_FOR_GENERIC>"extends" {
     yy_pop_state();
+    RETURN_TOKEN(T_EXTENDS);
 }
 
 <ST_LOOKING_FOR_GENERIC>"implements" {
     yy_pop_state();
+    RETURN_TOKEN(T_IMPLEMENTS);
 }
 
-<ST_LOOKING_FOR_GENERICS>"{" {
+<ST_LOOKING_FOR_GENERIC>"{" {
     yy_pop_state();
+    RETURN_TOKEN('{');
 }
 
-<ST_LOOKING_FOR_GENERICS>"<" {
+<ST_LOOKING_FOR_GENERIC>{LABEL} {
+    zend_copy_value(zendlval, yytext, yyleng);
+    RETURN_TOKEN(T_STRING);
+}
+
+<ST_LOOKING_FOR_GENERIC>"<" {
     yy_push_state(ST_IN_GENERIC);
     RETURN_TOKEN(T_OPEN_GENERIC);
 }
@@ -1301,7 +1309,7 @@ NEWLINE ("\r"|"\n"|"\r\n")
     RETURN_TOKEN(T_STRING);
 }
 
-<ST_IN_GENERIC>"}" {
+<ST_IN_GENERIC>">" {
     yy_pop_state();
     RETURN_TOKEN(T_CLOSE_GENERIC);
 }
