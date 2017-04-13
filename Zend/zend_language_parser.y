@@ -189,6 +189,8 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %token T_CLASS      "class (T_CLASS)"
 %token T_TRAIT      "trait (T_TRAIT)"
 %token T_INTERFACE  "interface (T_INTERFACE)"
+%token T_OPEN_GENERIC   "open generic (T_OPEN_GENERIC)"
+%token T_CLOSE_GENERIC  "close generic (T_CLOSE_GENERIC)"
 %token T_EXTENDS    "extends (T_EXTENDS)"
 %token T_IMPLEMENTS "implements (T_IMPLEMENTS)"
 %token T_OBJECT_OPERATOR "-> (T_OBJECT_OPERATOR)"

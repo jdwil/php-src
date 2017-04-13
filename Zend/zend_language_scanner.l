@@ -1265,15 +1265,45 @@ NEWLINE ("\r"|"\n"|"\r\n")
 }
 
 <ST_IN_SCRIPTING>"class" {
+    yy_push_state(ST_LOOKING_FOR_GENERIC);
 	RETURN_TOKEN(T_CLASS);
 }
 
 <ST_IN_SCRIPTING>"interface" {
+    yy_push_state(ST_LOOKING_FOR_GENERIC);
 	RETURN_TOKEN(T_INTERFACE);
 }
 
 <ST_IN_SCRIPTING>"trait" {
+    yy_push_state(ST_LOOKING_FOR_GENERIC);
 	RETURN_TOKEN(T_TRAIT);
+}
+
+<ST_LOOKING_FOR_GENERIC>"extends" {
+    yy_pop_state();
+}
+
+<ST_LOOKING_FOR_GENERIC>"implements" {
+    yy_pop_state();
+}
+
+<ST_LOOKING_FOR_GENERICS>"{" {
+    yy_pop_state();
+}
+
+<ST_LOOKING_FOR_GENERICS>"<" {
+    yy_push_state(ST_IN_GENERIC);
+    RETURN_TOKEN(T_OPEN_GENERIC);
+}
+
+<ST_IN_GENERIC>{LABEL} {
+    zend_copy_value(zendlval, yytext, yyleng);
+    RETURN_TOKEN(T_STRING);
+}
+
+<ST_IN_GENERIC>"}" {
+    yy_pop_state();
+    RETURN_TOKEN(T_CLOSE_GENERIC);
 }
 
 <ST_IN_SCRIPTING>"extends" {
